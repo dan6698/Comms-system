@@ -75,16 +75,20 @@ button {
 
 <body>
 
-<!-- PASSWORD GATE -->
+<!-- PASSWORD + USERNAME GATE -->
 <div id="lockScreen">
     <h2>Enter Access Password</h2>
     <input type="password" id="passwordInput" placeholder="Password">
-    <button onclick="checkPassword()">Enter</button>
+
+    <h3 style="margin-top:20px;">Choose Username</h3>
+    <input type="text" id="usernameInput" placeholder="Your name">
+
+    <button onclick="checkPassword()">Enter Chat</button>
 </div>
 
 <!-- CHAT CONTENT -->
 <div id="chatApp" style="display:none;">
-<header>Private Chat</header>
+<header id="chatHeader">Private Chat</header>
 
 <div class="chat" id="chat"></div>
 
@@ -98,70 +102,14 @@ button {
 /* 🔒 CHANGE THIS PASSWORD */
 const SITE_PASSWORD = "watchingyou";
 
+/* 👤 USERNAME STORAGE */
+let username = "Anonymous";
+
 function checkPassword() {
-    const input = document.getElementById("passwordInput").value;
+    const pass = document.getElementById("passwordInput").value;
+    const userInput = document.getElementById("usernameInput").value.trim();
 
-    if (input === SITE_PASSWORD) {
-        document.getElementById("lockScreen").style.display = "none";
-        document.getElementById("chatApp").style.display = "block";
-    } else {
-        alert("Wrong password");
-    }
-}
-</script>
+    if (pass === SITE_PASSWORD) {
 
-<!-- FIREBASE CHAT -->
-<script type="module">
+        if (userInput.length > 0) {
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-    getDatabase,
-    ref,
-    push,
-    onChildAdded
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-/* 🔥 PASTE YOUR FIREBASE CONFIG HERE */
-const firebaseConfig = {
-  apiKey: "AIzaSyDFDTYhuCHKKezbKbqQSbjS_fJa6RPJIT4",
-  authDomain: "comms-system.firebaseapp.com",
-  databaseURL: "https://comms-system-default-rtdb.firebaseio.com/",
-  projectId: "comms-system",
-  storageBucket: "comms-system.firebasestorage.app",
-  messagingSenderId: "597730048292",
-  appId: "1:597730048292:web:90fc4ab6b770ef43815bb1"
-};
-
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const messagesRef = ref(db, "messages");
-
-window.sendMessage = function() {
-    const input = document.getElementById("msg");
-    if (!input.value) return;
-
-    push(messagesRef, {
-        text: input.value,
-        time: Date.now()
-    });
-
-    input.value = "";
-};
-
-onChildAdded(messagesRef, snapshot => {
-    const data = snapshot.val();
-    const chat = document.getElementById("chat");
-
-    const msg = document.createElement("div");
-    msg.className = "message";
-    msg.textContent = data.text;
-
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-});
-
-</script>
-
-</body>
-</html>
