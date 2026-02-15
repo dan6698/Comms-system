@@ -105,7 +105,8 @@ const SITE_PASSWORD = "watchingyou";
 /* 👤 USERNAME STORAGE */
 let username = "Anonymous";
 
-function checkPassword() {
+window.checkPassword = function() {
+
     const pass = document.getElementById("passwordInput").value;
     const userInput = document.getElementById("usernameInput").value.trim();
 
