@@ -75,15 +75,11 @@ button {
 
 <body>
 
-<!-- PASSWORD + USERNAME GATE -->
+<!-- PASSWORD GATE -->
 <div id="lockScreen">
     <h2>Enter Access Password</h2>
     <input type="password" id="passwordInput" placeholder="Password">
-
-    <h3 style="margin-top:20px;">Choose Username</h3>
-    <input type="text" id="usernameInput" placeholder="Your name">
-
-    <button onclick="checkPassword()">Enter Chat</button>
+    <button onclick="checkPassword()">Enter</button>
 </div>
 
 <!-- CHAT CONTENT -->
@@ -99,18 +95,94 @@ button {
 </div>
 
 <script>
-/* 🔒 CHANGE THIS PASSWORD */
 const SITE_PASSWORD = "watchingyou";
+let username = "";
 
-/* 👤 USERNAME STORAGE */
-let username = "Anonymous";
+/* 50 random usernames */
+const namePool = [
+"RedFox","BlueTiger","GreenFalcon","SilverWolf","GoldenBear",
+"NeonShadow","IronEagle","CrystalLion","SwiftPanther","NightHawk",
+"StormRider","PixelGhost","CyberViper","SilentDragon","NovaHunter",
+"EchoKnight","FrostPhantom","LunarTiger","SolarRaven","DarkComet",
+"TurboFalcon","QuantumWolf","BlazeHawk","PhantomLion","RapidViper",
+"CosmicBear","MysticFox","ShadowTiger","IronFalcon","ThunderWolf",
+"NeonPanther","SteelDragon","GhostRider","NightFalcon","CyberWolf",
+"SolarKnight","FrostTiger","NovaFalcon","EchoWolf","BlazeDragon",
+"SilentRaven","QuantumFox","RapidTiger","StormFalcon","CrystalWolf",
+"LunarPanther","DarkViper","TurboLion","PixelFalcon","IronShadow"
+];
 
 window.checkPassword = function() {
+    const input = document.getElementById("passwordInput").value;
 
-    const pass = document.getElementById("passwordInput").value;
-    const userInput = document.getElementById("usernameInput").value.trim();
+    if (input !== SITE_PASSWORD) {
+        alert("error! you are an id10t");
+        return;
+    }
 
-    if (pass === SITE_PASSWORD) {
+    username = namePool[Math.floor(Math.random() * namePool.length)];
 
-        if (userInput.length > 0) {
+    document.getElementById("chatHeader").textContent =
+        "Private Chat — " + username;
+
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("chatApp").style.display = "block";
+};
+</script>
+
+<!-- FIREBASE CHAT -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getDatabase,
+    ref,
+    push,
+    onChildAdded
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  databaseURL: "YOUR_DATABASE_URL",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const messagesRef = ref(db, "messages");
+
+window.sendMessage = function() {
+    const input = document.getElementById("msg");
+    if (!input.value) return;
+
+    push(messagesRef, {
+        user: username,
+        text: input.value,
+        time: Date.now()
+    });
+
+    input.value = "";
+};
+
+onChildAdded(messagesRef, snapshot => {
+    const data = snapshot.val();
+    const chat = document.getElementById("chat");
+
+    const msg = document.createElement("div");
+    msg.className = "message";
+    msg.textContent = data.user + ": " + data.text;
+
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+});
+
+</script>
+
+</body>
+</html>
+
 
